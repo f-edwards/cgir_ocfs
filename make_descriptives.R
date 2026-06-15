@@ -71,7 +71,7 @@ c_long_imp |>
     FC_bin = sum(FC),
     Prev_bin = sum(Prev)
   ) |>
-  write_csv(file = "./output/hh_period_freq.csv")
+  write_csv(file = "./output/hh_period_bin.csv")
 
 # prognostic associations with survey features ----------------------------
 # n_child, gender, race, edu, sexorient, kessler, ah total, fw score

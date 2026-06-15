@@ -91,8 +91,105 @@ predmat <- make.predictorMatrix(temp)
 predmat[, "Child"] <- 0
 predmat[, "ID"] <- 0
 predmat[, "unit"] <- 0
-predmat[, "Edu"] <- 0
-predmat["Edu", ] <- 0
+# predmat[, "Edu"] <- 0
+# predmat["Edu", ] <- 0
 c_imp <- mice(temp, predictorMatrix = predmat, m = 5, maxit = 20)
 
 c_long_imp <- mice::complete(c_imp, action = "long", include = T)
+
+# diagnostics -------------------------------------------------------------
+pdf("./output/mice_trace.pdf", height = 8, width = 8)
+plot(c_imp, y = c("TotalCPS", "Confirmed", "Prev", "FC"), layout = c(2, 4))
+dev.off()
+
+pdf("./output/mice_density.pdf", height = 8, width = 8)
+densityplot(c_imp, ~ TotalCPS + Confirmed + Prev + FC)
+dev.off()
+
+c_long_imp |>
+  group_by(.imp, Wave, GROUP) |>
+  summarize(
+    n = sum(!(is.na(TotalCPS))),
+    across(TotalCPS:FC, \(x) sum(x, na.rm = T))
+  )
+
+# compute added cases on each outcome, compute prob
+observed <- temp |>
+  group_by(GROUP, Wave) |>
+  summarize(
+    n_obs = sum(!(is.na(TotalCPS))),
+    across(TotalCPS:FC, \(x) sum(x, na.rm = T)),
+  ) |>
+  rename(
+    TotalCPS_obs = TotalCPS,
+    Confirmed_obs = Confirmed,
+    Prev_obs = Prev,
+    FC_obs = FC
+  )
+
+imputed <- c_long_imp |>
+  filter(.imp > 0) |>
+  group_by(GROUP, Wave, .imp) |>
+  summarize(
+    n = n(),
+    across(TotalCPS:FC, \(x) sum(x, na.rm = T))
+  )
+# compute probability within imputed, compare to observed
+delta <- observed |>
+  left_join(imputed) |>
+  mutate(
+    n_delta = n - n_obs,
+    TotalCPS = TotalCPS - TotalCPS_obs,
+    Confirmed = Confirmed - Confirmed_obs,
+    Prev = Prev - Prev_obs,
+    FC = FC - FC_obs
+  ) |>
+  select(GROUP, Wave, .imp, n_delta, TotalCPS:FC) |>
+  pivot_longer(
+    cols = TotalCPS:FC,
+    names_to = "var",
+    values_to = "delta"
+  ) |>
+  mutate(delta_rate = delta / n_delta) |>
+  mutate(delta_rate = ifelse(is.nan(delta_rate), 0, delta_rate))
+
+observed_rt <- observed |>
+  pivot_longer(TotalCPS_obs:FC_obs, names_to = "var", values_to = "observed") |>
+  mutate(observed_rate = observed / n_obs) |>
+  mutate(var = str_sub(var, 1, -5)) |>
+  select(GROUP, Wave, var, observed_rate)
+
+delta <- delta |>
+  left_join(observed_rt) |>
+  filter(GROUP == "C")
+
+# plot rate among imputed against empirical to confirm distributions are similar
+
+p <- ggplot(delta, aes(y = delta_rate, x = Wave, group = .imp)) +
+  geom_point(alpha = 0.4) +
+  facet_wrap(~var) +
+  geom_point(aes(y = observed_rate), color = "red", shape = 2, alpha = 0.5) +
+  labs(
+    y = "Event rate",
+    subtitle = "Black points are event rates only among imputed cells, red triangle is empirical mean in control group"
+  )
+ggsave(plot = p, filename = "./output/mice_delta_rate.pdf")
+
+# plot full sample rates against empirical
+
+imputed_rt <- imputed |>
+  pivot_longer(TotalCPS:FC, names_to = "var", values_to = "imputed") |>
+  mutate(imputed_rate = imputed / n) |>
+  select(GROUP, Wave, .imp, var, imputed_rate) |>
+  filter(GROUP == "C") |>
+  left_join(observed_rt)
+
+p <- ggplot(imputed_rt, aes(y = imputed_rate, x = Wave, group = .imp)) +
+  geom_point(alpha = 0.4) +
+  facet_wrap(~var, scales = "free") +
+  geom_point(aes(y = observed_rate), color = "red", shape = 2, alpha = 0.5) +
+  labs(
+    y = "Event rate",
+    subtitle = "Black points are event rates for post-imputation samples (full data), red triangle is empirical mean in control group"
+  )
+ggsave(plot = p, filename = "./output/mice_full_rate.pdf")
