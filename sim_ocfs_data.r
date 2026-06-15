@@ -3,6 +3,10 @@ library(tidyverse)
 # scale down w1 to six months
 # delete after adjusting descriptive tables
 dat <- read_csv("./output1_12_26/child_table_period.csv")
+dat <- read_csv("./output6_5_26/child_period_freq.csv") |>
+  rename(n = n_child) |>
+  filter(.imp == 0) |>
+  select(-.imp)
 # pull IDs
 ID_list <- read_csv("./consort_data/group_assignment.csv") |>
   rename(GROUP = Group)
@@ -70,10 +74,10 @@ lambda <- dat |>
 sim_dat <- sim_dat |>
   left_join(lambda) |>
   mutate(
-    TotalCPS_l = TotalCPS_l * (1 + total_error / 10),
-    Confirmed_l = Confirmed_l * (1 + total_error / 10),
-    Prev_l = Prev_l * (1 + total_error / 10),
-    FC_l = FC_l * (1 + total_error / 10)
+    TotalCPS_l = TotalCPS_l * abs(1 + total_error / 10),
+    Confirmed_l = Confirmed_l * abs(1 + total_error / 10),
+    Prev_l = Prev_l * abs(1 + total_error / 10),
+    FC_l = FC_l * abs(1 + total_error / 10)
   )
 
 # simulate

@@ -1,0 +1,312 @@
+---
+title: "The effect of a recurring cash transfer on child welfare system contact and foster care: supplemental materials"
+output: 
+  bookdown::pdf_document2:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(pwr)
+library(patchwork)
+library(posterior)
+library(brms)
+knitr::opts_chunk$set(echo = F, messages=F, warning = F)
+theme_set(theme_classic())
+```
+
+# Recruitment and enrollment across counties
+
+Between May and June 2023, 501 households applied to participate in the study. The study team randomly selected 50 households from each of three counties into treatment and 100 from each county into control. We additionally sampled 5 households from each county into an oversample group in the event of study withdrawal. Participants were notified of their study enrollment status in late July 2023. Households selected into treatment were invited to onboard with the partner CBO to obtain a study debit card and benefits counseling beginning on July 31, 2023. Two households chose to withdraw from the treatment group at this stage, and 28 households failed to schedule onboarding meetings. Oversampled households were transferred into treatment, and an additional 15 households were randomly selected from the control group and transferred into the treatment group to ensure a final sample of 50 households in treatment in each of three counties.
+
+By June 15, 2023, we had received 188 applications to participate in Monroe County and 158 applications in Onondaga County and closed enrollment. Enrollment in Westchester County completed more slowly, requiring an additional wave of recruitment letters. By July 12, 2023 we had received 155 applications in Westchester County and closed enrollment.
+
+# Deviations from pre-registered analysis plan
+
+## Study outcomes and administrative data structure
+
+Our selection of primary outcomes in the manuscript deviates slightly from the pre-registered analysis plan due to a desire for parsimony and to most meaningfully align with the structure of the New York State administrative data. The pre-registered analysis plan listed the following as primary outcomes: Unfounded reports to CPS, investigative track reports to CPS, indicated reports to CPS, substantiated reports to CPS, FAR track reports to CPS, unsubstantiated reports to CPS, foster care entries, and preventive services for families at risk of foster care. In New York State administrative data, CPS information is stored at two levels: report level and allegation level. Report determination outcomes include “indicated” or “unfounded”. Substantiation is an allegation-level outcome. For example, one report can have multiple allegations, some of which can be substantiated and others unsubstantiated. Additionally, reports that are assigned to the FAR track do not receive a final status of indicated or unfounded, nor do the specific allegations receive designations of substantiated or unsubstantiated.
+
+In consultation with OCFS data administrators, the study team decided to collapse this initial set of 8 outcomes into 4 measures:  1) total child maltreatment reports (inclusive of all reports); 2) confirmed child maltreatment reports (inclusive of substantiated allegations within indicated reports); 3) enrollment in preventive services and 4) foster care entries. This set of outcomes allowed us to capture most of the meaningful information contained within the pre-registered variables. Information about unfounded reports to CPS, investigative track reports to CPS, indicated reports to CPS, and FAR track reports to CPS were captured within the broad Category 1 (Total Child Maltreatment Reports), but exclude allegation specific information that would complicate our unit-of-analysis. Category 2 captured more specific information about those reports that were confirmed (indicated reports to CPS, those which had at least 1 substantiated allegation). Categories 3 and 4 (preventive services and foster care) remained as originally pre-registered. The decision to approach analysis of the New York State administrative data in this manner allowed this study to maintain all final data at the report-child level for each period, an approach that minimizes redundant hypothesis tests and streamlines the presentation of results.
+
+# Model specifications and results
+
+Below, we describe the specification and complete results of all regression models estimated for the study. Abridged results focusing on sample average treatment effects are presented in the main text. All models were estimated using Hamiltonian Monte Carlo using the Stan programming language as implemented in the `R` package `brms`. 
+
+**REVISE**
+
+
+<!-- ## Model results -->
+
+<!-- Estimates for all model parameters are presented below in Tables \@ref(tab:regtab1) through \@ref(tab:regtab4). We provide posterior means, posterior standard deviations, upper and lower bounds for 95% posterior credible intervals, and model diagnostics including $\hat{R}$ which describes Markov Chain convergence and two effective sample size that measure the efficiency of model sampling both near the center of the distributions and in the tails.  -->
+
+<!-- Table \@ref(tab:regtab1) presents estimates for our model of total maltreatment reports, a Poisson multilevel model. Table \@ref(tab:regtab2) presents estimates for our model of confirmed maltreatment reports, a Poisson multilevel model. Table \@ref(tab:regtab3) presents estimates for our model of enrollment in preventive services, a logistic multilevel model. Table \@ref(tab:regtab4) presents estimates for our model of foster care entries, a Poisson multilevel model.   -->
+
+<!-- ```{r include = F} -->
+<!-- m_total <- read_csv("./ocfs_output/mc_TotalCPS_p.csv") -->
+<!-- m_confirmed <- read_csv("./ocfs_output/mc_Confirmed_p.csv") -->
+<!-- m_prev <- read_csv("./ocfs_output/archive/mc_Prev_l.csv") -->
+<!-- m_fc <- read_csv("./ocfs_output/mc_FC_p.csv") -->
+
+<!-- labels <- c("Intercept", "Wave 2", "Wave 3", "Wave 4", -->
+<!--           "Onondaga County", "Westchester County",  -->
+<!--           "Wave 1 x Treatment", "Wave 2 x Treatment", -->
+<!--           "Wave 3 x Treatment", "Wave 4 x Treatment", -->
+<!--           "sigma_delta", "delta") -->
+
+<!-- tab_m_total <- summarize_draws(m_total) |>  -->
+<!--   mutate("variable" = labels) |>  -->
+<!--   select(variable, mean, sd, q5, q95, rhat, ess_bulk, ess_tail) |>  -->
+<!--   slice(1:10) -->
+
+<!-- tab_m_confirmed <- summarize_draws(m_confirmed) |>  -->
+<!--   mutate("variable" = labels) |>  -->
+<!--   select(variable, mean, sd, q5, q95, rhat, ess_bulk, ess_tail) |>  -->
+<!--   slice(1:10) -->
+
+<!-- tab_m_prev <- summarize_draws(m_prev) |>  -->
+<!--   mutate("variable" = labels) |>  -->
+<!--   select(variable, mean, sd, q5, q95, rhat, ess_bulk, ess_tail) |>  -->
+<!--   slice(1:10) -->
+
+<!-- tab_m_fc <- summarize_draws(m_fc) |>  -->
+<!--   mutate("variable" = labels) |>  -->
+<!--   select(variable, mean, sd, q5, q95, rhat, ess_bulk, ess_tail) |>  -->
+<!--   slice(1:10) -->
+
+<!-- names_tab <- c("", "Estimate", "Est.Error", "l-95% CI", "u-95% CI", "Rhat", "Bulk_ESS", "Tail_ESS") -->
+<!-- names(tab_m_total) <- names_tab -->
+<!-- names(tab_m_confirmed) <- names_tab -->
+<!-- names(tab_m_prev) <- names_tab -->
+<!-- names(tab_m_fc) <- names_tab -->
+<!-- ``` -->
+
+
+<!-- ```{r regtab1, results = "asis"} -->
+<!-- knitr::kable(tab_m_total,  -->
+<!--              digits = 3, -->
+<!--              caption = "Parameter estimates from regression model of total maltreatment reports with diagnostics") -->
+<!-- ``` -->
+
+<!-- ```{r regtab2, results = "asis"} -->
+<!-- knitr::kable(tab_m_confirmed,  -->
+<!--              digits = 3, -->
+<!--              caption = "Parameter estimates from regression model of confirmed maltreatment reports with diagnostics") -->
+<!-- ``` -->
+
+<!-- ```{r regtab3, results = "asis"} -->
+<!-- knitr::kable(tab_m_prev,  -->
+<!--              digits = 3, -->
+<!--              caption = "Parameter estimates from regression model of preventive services enrollment with diagnostics") -->
+<!-- ``` -->
+
+<!-- ```{r regtab4, results = "asis"} -->
+<!-- knitr::kable(tab_m_fc,  -->
+<!--              digits = 3, -->
+<!--              caption = "Parameter estimates from regression model of foster care entry with diagnostics") -->
+<!-- ``` -->
+
+## Sensitivity of results to model specification
+
+**REVISE**
+
+\newpage
+
+# Sample size and power analysis
+
+Here, we describe statistical power calculations for the focal analyses. First, we describe optimal sample sizes under varying effect size scenarios for reference. Sample size for this study, was fixed by policymakers in collaboration with the research team based on budget constraints at 150 households in the treatment arm and 300 in the control arm. We demonstrate the statistical power of analyses under varying effect sizes, computed using Cohen's $h$ method for differences in proportions. We find that the given sample sizes are adequate to detect significant differences in proportions for any effect size when the event base rate is not small. When the base rate is small, the study is only powered to detect large effects. 
+
+## Sample size under fixed power
+
+```{r sampSize, fig.cap = "Sample size required to detect significant differences for varying effect sizes across outcomes. Note logarithmic transformation of horizontal axis"}
+pdat <- expand_grid(
+  p = c(0.5, 0.2, 0.05),
+  effect_size = c(0.9, 0.8, 0.5)) |> 
+  mutate(n = NA,
+         h = NA) |> 
+  mutate(var = case_when(
+    p == 0.5 ~ "Allegation",
+    p == 0.2 ~ "Confirmed maltreatment",
+    p == 0.05 ~ "Foster care"),
+    effect_size_lab = case_when(
+      effect_size == 0.9 ~ "Small effect",
+      effect_size == 0.8 ~ "Moderate effect",
+      effect_size == 0.5 ~ "Large effect"))
+
+
+# iterate over outcomes and effect sizes
+for(i in 1:nrow(pdat)){
+  temp <- pwr.2p.test(h = ES.h(p1 = pdat$p[i] * pdat$effect_size[i],
+                               p2 = pdat$p[i]),
+                          sig.level = 0.05,
+                          power = 0.8,
+                          alternative = "less") 
+  pdat$n[i] <- temp$n
+  pdat$h[i] <- temp$h
+}
+
+ggplot(pdat,
+       aes(y = effect_size_lab,
+           x = n,
+           color = var)) + 
+  geom_point() + 
+  scale_x_log10() + 
+  labs(y = "",
+       x = "Sample size",
+       color = "")
+```
+
+First, we estimate the sample size required to estimate a one-sided statistically significant result for a difference in proportions under a set of reasonable prior probabilities for each of three focal outcomes. We set prior beliefs for the proportion of children experiencing a set of focal outcomes to reflect baseline estimates for event incidence prior to treatment. We set our prior for the probability of a child maltreatment allegation at 0.5, for confirmed maltreatment at 0.2, and for foster care at 0.05. We define effect sizes as relative changes in the prior proportion, choosing values of 0.9, 0.8, and 0.5 to reflect a small decrease (10%), a moderate decrease (20%), and a large decrease (50%) in probability. We compute difference of proportion power calculations for a binomial distribution using an arcsine transformation for effect size $h$ using the `pwr` library in `R`. 
+
+
+Optimal sample sizes for varying scenarios under differing base rates are displayed in Figure \@ref(fig:sampSize). If our prior probability of 0.5 for the probability of a maltreatment allegation for enrolled children is reasonable, we require a power of 0.8, and a 0.05 significance threshold for a one-tailed difference in proportions test, we estimate a required sample size (in each arm) of 1232 for a small effect size (10% relative decrease), 305 for a moderate effect size (20% relative decrease), and 45 for a large effect size (50% relative decrease).
+
+For confirmed maltreatment with a prior probability of 0.2, we find the required sample size to detect a small effect (10% relative decrease) with 0.8 statistical power is 4755, the required sample size for a moderate effect (20% decrease) is 1137, and the required sample size for a large effect (50% decrease) is 154. For foster care (prior probability 0.05), we find the required sample size to detect a small effect is over 20,000, 5,300 for a moderate effect size, and 694 for a large effect size.
+
+Given a fixed sample size of 150 households in treatment and 300 in control, and assuming two children under 18 per household, this study should be adequately powered to detect large, medium, and small effects in differences in allegations, large effects in differences in confirmed maltreatment, and only very large effects in foster care. 
+
+## Power under fixed sample size
+
+Given that our sample size was set *a priori*, we also estimate the statistical power obtained under varying effect size conditions for a fixed sample size. We use Cohen's method for computing an effect size $h$ as a difference in proportions, and follow convention in defining a large effect as 0.8. Because we exclusively hypothesize beneficial effects of the treatment on child welfare system events, we estimate power for a range of *negative* effect sizes and restrict comparisons to one-tailed tests. 
+
+Figure \@ref(fig:power1) shows the obtained statistical power under varying effect sizes for a sample size fixed at 300 in the treatment arm and 600 in the control arm. We find that this sample size is powered at or above 0.8 for all effect sizes less than or equal to -0.18, which captures 'small' effects per canonical interpretations of Cohen's $h$. 
+
+```{r power1, fig.cap = "Statistical power and effect size for a fixed sample size, dotted line indicates power = 0.8"}
+pdat <- data.frame(
+  h = seq(-0.8,0, by = 0.01),
+  pow = NA)
+for(i in 1:nrow(pdat)){
+  temp <- pwr.2p2n.test(
+    h = pdat$h[i],
+    n1 = 300, n2 = 600, 
+    sig.level = 0.05, 
+    alternative = "less")
+  pdat$pow[i] <- temp$power
+}
+
+ggplot(pdat,
+       aes(x = h, y = pow)) + 
+  geom_point() + 
+  geom_line() + 
+  labs(x = "Effect size h",
+       y = "Power") + 
+  geom_hline(yintercept = 0.8, lty = 2)
+```
+
+Next, we assume varying levels of attrition in the sample, ranging from 10% attrition up to 50% attrition. Results are displayed in Figure \@ref(fig:power2). Under a high level of attrition (50 percent), we find that the maximum detectable effect size at 0.8 statistical power is -0.26, above the threshold of a 'small' effect for Cohen's $h$. For an attrition rate of 25%, the largest detectable negative effect is -0.21. For an attrition rate of 10%, the largest effect size is -0.19. 
+
+```{r power2, fig.cap = "Power under attrition"}
+pdat <- expand_grid(
+  h = seq(-0.8,0, by = 0.01),
+  pow = NA,
+  attrition = c(1, 0.9, 0.75, 0.5))
+for(i in 1:nrow(pdat)){
+  temp <- pwr.2p2n.test(
+    h = pdat$h[i],
+    n1 = 300 * pdat$attrition[i], n2 = 600 * pdat$attrition[i], 
+    sig.level = 0.05, 
+    alternative = "less")
+  pdat$pow[i] <- temp$power
+}
+
+ggplot(pdat,
+       aes(x = h, y = pow,
+           color = factor(attrition))) + 
+  geom_point(alpha = 0.8) + 
+  geom_line(alpha = 0.8) + 
+  labs(x = "Effect size h",
+       y = "Power") + 
+  geom_hline(yintercept = 0.8, lty = 2)
+```
+
+## Conclusion
+
+In sum, we find that the study's sample size of $n_t = 150$ and $n_c = 300$ is likely to be able to detect all but very small effects for differences in proportions between treatment and control for most events. The study is likely *underpowered* to detect anything except a large effect in foster care, given the relative rarity of the event. An optimal sample size for detecting differences in a relatively rare event, like foster care, is likely to be on the order of magnitude of thousands for a small effect size, as shown in Figure \@ref(fig:sampSize). 
+
+# Prior predictive simulation
+
+```{r include = F, message = F}
+# packages ----------------------------------------------------------------
+library(tidyverse)
+library(lme4)
+library(brms)
+library(patchwork)
+library(broom.mixed)
+library(mice)
+source("sim_ocfs_data.R")
+
+# FOR OCFS DATA make_c_long will pivot wide to long
+# cdat <-  read_csv("FILENAME.csv")
+# source("make_c_long.r")
+
+# imputation --------------------------------------------------------------
+# first time, source to generate imputed data from withdrawals.
+# will add 19 x 4 rows to c_long for missing cases
+# after one pass, use readRDS to save time
+source("./impute_drops.R")
+
+c_long_imp <- mice::complete(c_imp, action = "long", include = T)
+
+options(mc.cores = 4, 
+        brms.backend = 'cmdstanr', 
+        brms.file_refit = 'on_change')
+
+model_controls <- list(
+  adapt_delta = 0.999,
+  step_size = 0.01,
+  max_treedepth = 15
+)
+
+temp <- c_long_imp |>
+  filter(.imp == 1)
+```
+
+## The model
+
+We estimate logistic regression models for a set of four binary event outcomes for children in six month intervals. Our regression models take the following form:
+
+$$y_{ij} \sim \textrm{Bernoulli}(p_{ij})$$
+$$\textrm{logit}(p_{ij}) = \beta_0 + \alpha_i + \delta_j + \gamma_k +  \beta (j \times T_i)$$ 
+$$\alpha_i \sim \textrm{N}(0, \sigma^2_\alpha)$$
+Below, we describe our preferred set of prior distributions for regression parameters and hyperparameters, and evaluate whether the prior predictive distribution for this model generates sensible values for our outcomes.
+
+## Prior predictive checks
+
+We rely on prior distributions for model parameters merely to regularize posterior estimates, not to incorporate specific prior information into the model specification. To ensure that priors we only weakly informative, we explored priors that have a wide range of plausible parameter values and constrained model estimates to ranges that will generate sensible predictions for our outcomes.
+
+
+Following Gelman et al. (), we set Cauchy priors for LIST THE GREEK
+
+We set a half-Student's-t prior for multilevel variance hyperparameters, which constrains sampling to strictly non-negative values with substantial tail mass. 
+
+Our priors take the following form:
+
+$$\beta, \delta, \gamma \sim \textrm{Cauchy}(0,10)$$
+$$\sigma_\alpha \sim \textrm{half-}t(3, 0, 2.5)$$
+
+To evaluate coverage, we arbitrarily assume that empirical event probabilities may fall around 0.5, 0.2, 0.05, or 0.01. We then sample from the prior predictive distribution, assuming the priors and model specification described above, and compute means of these simulations across samples. We compare the distribution of these prior predictive means to our hypothetical event probabilities to ensure adequate coverage of the parameter space given the likely range of the empirical data.
+
+As shown in Figure \@ref(ppd-weak), this set of priors allows for a very wide range of prior probabilities, and provides coverage for events with probabilities near 0.5 as well as rarer events with probabilities closer to zero. To avoid specifying separate priors for each outcome, we opt for this set of weakly informative priors to regularize our parameter estimates.
+
+```{r include = F}
+priorsWeak <- c(
+  set_prior("cauchy(0, 10)", class = "b"),
+  set_prior("cauchy(0, 10)", class = "Intercept"),
+  set_prior("student_t(3, 0, 2.5)", class = "sd")
+)
+
+ppd_1 <- brm(
+  TotalCPS > 0 ~ Wave + GROUP:Wave + COUNTY + (1 | ID),
+  family = bernoulli(),
+  data = temp,
+  prior = priorsWeak,
+  sample_prior = "only",
+  refresh = 0
+)
+```
+
+
+```{r ppd-weak, echo = F, message = F, fig.cap = "Prior predictive for Normal(0,5) on intercepts and beta"}
+pp_check(ppd_1, prefix = "ppd", ndraws = 4000, type = "stat", stat = "mean") + 
+  geom_vline(xintercept = c(0.01, 0.05, 0.1, 0.2, 0.5), lty = 2)
+```

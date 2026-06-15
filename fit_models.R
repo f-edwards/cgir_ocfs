@@ -17,6 +17,7 @@ model_controls <- list(
   stepsize = 0.01,
   max_treedepth = 15
 )
+
 iter <- 1e4
 
 n_imps <- max(c_long_imp$.imp)
@@ -59,8 +60,8 @@ c_imp_complete_case <- c_long_imp |>
 # regression models -------------------------------------------------------
 # priors ------------------------------------------------------------------
 priorsL <- priorsL_FC <- c(
-  set_prior("student_t(3, 0, 10)", class = "b"),
-  set_prior("student_t(3, 0, 10)", class = "Intercept"),
+  set_prior("cauchy(0, 10)", class = "b"),
+  set_prior("cauchy(0, 10)", class = "Intercept"),
   set_prior("student_t(3, 0, 1)", class = "sd")
 )
 
@@ -101,6 +102,10 @@ TotalCPS_b_s1 <- brm(
 sink("./output/TotalCPS_b_s1.txt")
 print(TotalCPS_b_s1)
 sink()
+# posteriors for fixed effects
+tidy_draws(TotalCPS_b_s1) |>
+  select(.chain:Intercept) |>
+  write_csv("./output/TotalCPS_b_s1.csv")
 
 # 2. with controls
 TotalCPS_b_s2 <- brm_multiple(
@@ -128,10 +133,14 @@ TotalCPS_b_s2 <- brm_multiple(
 sink("./output/TotalCPS_b_s2.txt")
 print(TotalCPS_b_s2)
 sink()
+# posteriors for fixed effects
+tidy_draws(TotalCPS_b_s2) |>
+  select(.chain:Intercept) |>
+  write_csv("./output/TotalCPS_b_s2.csv")
 
 # 3. Collapsed time
 TotalCPS_b_s3 <- brm_multiple(
-  TotalCPS > 0 ~ Wave + GROUP:Wave + COUNTY + (1 | Child),
+  TotalCPS > 0 ~ Wave_collapsed + GROUP:Wave_collapsed + COUNTY + (1 | Child),
   family = bernoulli(),
   data = c_imp,
   prior = priorsL,
@@ -143,6 +152,10 @@ TotalCPS_b_s3 <- brm_multiple(
 sink("./output/TotalCPS_b_s_3.txt")
 print(TotalCPS_b_s3)
 sink()
+# posteriors for fixed effects
+tidy_draws(TotalCPS_b_s3) |>
+  select(.chain:Intercept) |>
+  write_csv("./output/TotalCPS_b_s3.csv")
 
 # 4. fixed effects linear probability
 m_out <- list()
@@ -155,7 +168,7 @@ for (i in 1:length(p_data)) {
     model = "within"
   )
 
-  m_out[[i]] <- coeftest(m0, function(x) {
+  m_out[[i]] <- coeftest(m_temp, function(x) {
     vcovHC(x, type = 'HC0', cluster = 'group')
   })
 }
@@ -199,6 +212,10 @@ Confirmed_b_s1 <- brm(
 sink("./output/Confirmed_b_s1.txt")
 print(Confirmed_b_s1)
 sink()
+# posteriors for fixed effects
+tidy_draws(Confirmed_b_s1) |>
+  select(.chain:Intercept) |>
+  write_csv("./output/Confirmed_b_s1.csv")
 
 # 2. with controls
 Confirmed_b_s2 <- brm_multiple(
@@ -226,10 +243,14 @@ Confirmed_b_s2 <- brm_multiple(
 sink("./output/Confirmed_b_s2.txt")
 print(Confirmed_b_s2)
 sink()
+# posteriors for fixed effects
+tidy_draws(Confirmed_b_s2) |>
+  select(.chain:Intercept) |>
+  write_csv("./output/Confirmed_b_s2.csv")
 
 # 3. Collapsed time
 Confirmed_b_s3 <- brm_multiple(
-  Confirmed > 0 ~ Wave + GROUP:Wave + COUNTY + (1 | Child),
+  Confirmed > 0 ~ Wave_collapsed + GROUP:Wave_collapsed + COUNTY + (1 | Child),
   family = bernoulli(),
   data = c_imp,
   prior = priorsL,
@@ -241,6 +262,10 @@ Confirmed_b_s3 <- brm_multiple(
 sink("./output/Confirmed_b_s3.txt")
 print(Confirmed_b_s3)
 sink()
+# posteriors for fixed effects
+tidy_draws(Confirmed_b_s3) |>
+  select(.chain:Intercept) |>
+  write_csv("./output/Confirmed_b_s3.csv")
 
 # 4. fixed effects linear probability
 m_out <- list()
@@ -253,7 +278,7 @@ for (i in 1:length(p_data)) {
     model = "within"
   )
 
-  m_out[[i]] <- coeftest(m0, function(x) {
+  m_out[[i]] <- coeftest(m_temp, function(x) {
     vcovHC(x, type = 'HC0', cluster = 'group')
   })
 }
@@ -286,7 +311,7 @@ tidy_draws(Prev_b) |>
 # sensitivity
 
 # 1. complete case
-Prev_b_s_1 <- brm(
+Prev_b_s1 <- brm(
   Prev > 0 ~ Wave + GROUP:Wave + COUNTY + (1 | Child),
   family = bernoulli(),
   data = c_imp_complete_case,
@@ -298,6 +323,10 @@ Prev_b_s_1 <- brm(
 sink("./output/Prev_b_s1.txt")
 print(Prev_b_s_1)
 sink()
+# posteriors for fixed effects
+tidy_draws(Prev_b_s1) |>
+  select(.chain:Intercept) |>
+  write_csv("./output/Prev_b_s1.csv")
 
 # 2. with controls
 Prev_b_s2 <- brm_multiple(
@@ -325,10 +354,14 @@ Prev_b_s2 <- brm_multiple(
 sink("./output/Prev_b_s2.txt")
 print(Prev_b_s2)
 sink()
+# posteriors for fixed effects
+tidy_draws(Prev_b_s2) |>
+  select(.chain:Intercept) |>
+  write_csv("./output/Prev_b_s2.csv")
 
 # 3. Collapsed time
 Prev_b_s3 <- brm_multiple(
-  Prev > 0 ~ Wave + GROUP:Wave + COUNTY + (1 | Child),
+  Prev > 0 ~ Wave_collapsed + GROUP:Wave_collapsed + COUNTY + (1 | Child),
   family = bernoulli(),
   data = c_imp,
   prior = priorsL,
@@ -340,6 +373,10 @@ Prev_b_s3 <- brm_multiple(
 sink("./output/Prev_b_s3.txt")
 print(Prev_b_s3)
 sink()
+# posteriors for fixed effects
+tidy_draws(Prev_b_s3) |>
+  select(.chain:Intercept) |>
+  write_csv("./output/Prev_b_s3.csv")
 
 # 4. fixed effects linear probability
 m_out <- list()
@@ -352,7 +389,7 @@ for (i in 1:length(p_data)) {
     model = "within"
   )
 
-  m_out[[i]] <- coeftest(m0, function(x) {
+  m_out[[i]] <- coeftest(m_temp, function(x) {
     vcovHC(x, type = 'HC0', cluster = 'group')
   })
 }
@@ -398,6 +435,10 @@ FC_b_s1 <- brm(
 sink("./output/FC_b_s1.txt")
 print(FC_b_s1)
 sink()
+# posteriors for fixed effects
+tidy_draws(FC_b_s1) |>
+  select(.chain:Intercept) |>
+  write_csv("./output/FC_b_s1.csv")
 
 # 2. with controls
 FC_b_s2 <- brm_multiple(
@@ -425,10 +466,14 @@ FC_b_s2 <- brm_multiple(
 sink("./output/FC_b_s2.txt")
 print(FC_b_s2)
 sink()
+# posteriors for fixed effects
+tidy_draws(FC_b_s2) |>
+  select(.chain:Intercept) |>
+  write_csv("./output/FC_b_s2.csv")
 
 # 3. Collapsed time
 FC_b_s3 <- brm_multiple(
-  FC > 0 ~ Wave + GROUP:Wave + COUNTY + (1 | Child),
+  FC > 0 ~ Wave_collapsed + GROUP:Wave_collapsed + COUNTY + (1 | Child),
   family = bernoulli(),
   data = c_imp,
   prior = priorsL,
@@ -440,6 +485,10 @@ FC_b_s3 <- brm_multiple(
 sink("./output/FC_b_s3.txt")
 print(FC_b_s3)
 sink()
+# posteriors for fixed effects
+tidy_draws(FC_b_s3) |>
+  select(.chain:Intercept) |>
+  write_csv("./output/FC_b_s3.csv")
 
 # 4. fixed effects linear probability
 m_out <- list()
@@ -452,7 +501,7 @@ for (i in 1:length(p_data)) {
     model = "within"
   )
 
-  m_out[[i]] <- coeftest(m0, function(x) {
+  m_out[[i]] <- coeftest(m_temp, function(x) {
     vcovHC(x, type = 'HC0', cluster = 'group')
   })
 }
