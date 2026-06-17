@@ -321,7 +321,7 @@ Prev_b_s1 <- brm(
   control = model_controls
 )
 sink("./output/Prev_b_s1.txt")
-print(Prev_b_s_1)
+print(Prev_b_s1)
 sink()
 # posteriors for fixed effects
 tidy_draws(Prev_b_s1) |>

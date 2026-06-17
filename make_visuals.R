@@ -538,9 +538,7 @@ p4 <- p_out |>
 
 
 p1 + p2 + plot_layout(axes = "collect_y")
-ggsave("./vis/posteriors_1.pdf", width = 7, height = 7)
+ggsave("./vis/posteriors_1.pdf", width = 12, height = 7)
 p3 + p4 + plot_layout(axes = "collect_y")
-ggsave("./vis/posteriors_2.pdf", width = 7, height = 7)
+ggsave("./vis/posteriors_2.pdf", width = 12, height = 7)
 # SPLIT INTO TWO PLOTS
-
-ggsave("./vis/fig3.png", width = 7, height = 7)

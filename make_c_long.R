@@ -103,8 +103,8 @@ c_long <- c_Confirmed |>
 c_long <- c_long |>
   mutate(
     COUNTY = case_when(
-      COUNTY == "MonroeCounty" ~ "Monroe",
-      COUNTY == "OnondagaCounty" ~ "Onondaga",
-      COUNTY == "WestchesterCounty" ~ "Westchester"
+      COUNTY == "Monroe County" ~ "Monroe",
+      COUNTY == "Onondaga County" ~ "Onondaga",
+      COUNTY == "Westchester County" ~ "Westchester"
     )
   )
