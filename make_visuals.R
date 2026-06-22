@@ -176,7 +176,7 @@ ggplot(
   ) +
   facet_wrap(~var, scales = "free", nrow = 4, strip.position = "top")
 
-ggsave("./vis/fig2.pdf", width = 8, height = 6)
+ggsave("./vis/fig2.png", width = 8, height = 6, units = "in", dpi = 300)
 
 # posterior inference ---------------------------------------------------------
 # pull parameter estimates from .csv files directly
