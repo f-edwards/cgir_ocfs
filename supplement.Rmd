@@ -15,7 +15,21 @@ knitr::opts_chunk$set(echo = F, messages=F, warning = F)
 theme_set(theme_classic())
 ```
 
+PARKING LOT
+
+We collapse investigative track and FAR track report outcomes into a single total CPS report outcome. We collapse indicated and substantiated report outcomes into a single confirmed report outcome. 
+
+
+
+
 # Recruitment and enrollment across counties
+
+INCENTIVES
+BH callibration and methods.
+
+Details on priors, sensitivity to model specification, multiple comparison adjustments, and imputation are provided in the supplement.
+
+command+F supplement to confirm coverage
 
 Between May and June 2023, 501 households applied to participate in the study. The study team randomly selected 50 households from each of three counties into treatment and 100 from each county into control. We additionally sampled 5 households from each county into an oversample group in the event of study withdrawal. Participants were notified of their study enrollment status in late July 2023. Households selected into treatment were invited to onboard with the partner CBO to obtain a study debit card and benefits counseling beginning on July 31, 2023. Two households chose to withdraw from the treatment group at this stage, and 28 households failed to schedule onboarding meetings. Oversampled households were transferred into treatment, and an additional 15 households were randomly selected from the control group and transferred into the treatment group to ensure a final sample of 50 households in treatment in each of three counties.
 
