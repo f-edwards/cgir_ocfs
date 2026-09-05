@@ -54,7 +54,7 @@ for (t in theta) {
     # loop over each hh, populate child id, then randomly sample to n
     child_list <- list()
     child_index <- 1
-    for (i in unique(w1$ID)) {
+    for (i in unique(dat$ID)) {
       temp <- dat |>
         filter(ID == i)
       if (temp$n_child > 0) {
@@ -192,30 +192,30 @@ fc_post_out |>
   write_csv("./data/power_fc_mc_sim.csv")
 
 # visualize
-
-post_df <- fc_post_out |>
-  bind_rows() |>
-  mutate(
-    var = case_when(
-      var == "b_Wave2:GROUPT" ~ "Treatment period 1",
-      var == "b_Wave3:GROUPT" ~ "Treatment period 2",
-      var == "b_Wave4:GROUPT" ~ "Post-treatment"
-    ),
-    theta_fct = case_when(
-      theta == 0 ~ "Theta = 0 (Null)"
-      theta == -0.1 ~ "Theta = -0.1",
-      theta == -0.5 ~ "Theta = -0.5",
-      theta == -1 ~ "Theta = -1",
-      theta == -5 ~ "Theta = -5"
-    )
-  ) |>
-  mutate(
-    var = factor(
-      var,
-      levels = c("Treatment period 1", "Treatment period 2", "Post-treatment")
-    ),
-    theta_fct = factor(
-      theta_fct,
-      levels = c("Theta = 0 (Null)", "Theta = -0.1", "Theta = -0.5", "Theta = -1", "Theta = -5")
-    )
-  )
+# 
+# post_df <- fc_post_out |>
+#   bind_rows() |>
+#   mutate(
+#     var = case_when(
+#       var == "b_Wave2:GROUPT" ~ "Treatment period 1",
+#       var == "b_Wave3:GROUPT" ~ "Treatment period 2",
+#       var == "b_Wave4:GROUPT" ~ "Post-treatment"
+#     ),
+#     theta_fct = case_when(
+#       theta == 0 ~ "Theta = 0 (Null)"
+#       theta == -0.1 ~ "Theta = -0.1",
+#       theta == -0.5 ~ "Theta = -0.5",
+#       theta == -1 ~ "Theta = -1",
+#       theta == -5 ~ "Theta = -5"
+#     )
+#   ) |>
+#   mutate(
+#     var = factor(
+#       var,
+#       levels = c("Treatment period 1", "Treatment period 2", "Post-treatment")
+#     ),
+#     theta_fct = factor(
+#       theta_fct,
+#       levels = c("Theta = 0 (Null)", "Theta = -0.1", "Theta = -0.5", "Theta = -1", "Theta = -5")
+#     )
+#   )
