@@ -19,74 +19,77 @@ r_main <- read_csv("./vis/reg_table_main.csv")
 # Table 1
 
 ```{r echo = F, message = F}
-# table 1 inputs ----------------------------------------------------------
-group <- read_csv("./data/group_assignment.csv")
-
-datw1 <- read_csv("./data/w1_reduced.csv") |>
-  left_join(group) |>
-  rename(GROUP = Group) |>
-  mutate(GROUP = ifelse(is.na(GROUP), "C", GROUP))
-
-temp0 <- datw1 |>
-  group_by(GROUP, County) |>
-  count()
-
-temp1 <- datw1 |>
-  group_by(GROUP) |>
-  summarize(n_child_mn = mean(n_child), 
-            n_child_sd = sd(n_child),
-            Age_mn = mean(Age_c),
-            Age_sd = sd(Age_c),
-            GenderF = sum(Gender_s == "Female", na.rm = T),
-            GenderF_pct = mean(Gender_s == "Female", na.rm = T) * 100) 
-
-abstract <- datw1 |>
-  summarize(n_child_mn = mean(n_child), 
-            n_child_sd = sd(n_child),
-            Age_mn = mean(Age_c),
-            Age_sd = sd(Age_c),
-            GenderF = sum(Gender_s == "Female", na.rm = T),
-            GenderF_pct = mean(Gender_s == "Female", na.rm = T) * 100) 
-
-temp2 <- datw1 |>
-  group_by(GROUP) |>
-  summarize(across(Race_White:Race_Other, sum, na.rm = T))
-
-# edu levels for table, less than HS, HS or GED, some college
-# levels: 
-abs <- datw1 |>
-  summarize(LessThanHS = mean(Edu<5, na.rm=T),
-            HS = mean((Edu==5) | (Edu==6), na.rm=T),
-            College = mean(Edu>6, na.rm=T))
-temp4 <- datw1 |>
-  group_by(GROUP) |>
-  summarize(
-    LessThanHS = sum(Edu<5, na.rm=T),
-    HS = sum((Edu==5) | (Edu==6), na.rm=T),
-    College = sum(Edu>6, na.rm=T))
-
-tab_out <- temp1 |> 
-  left_join(temp2) |> 
-  left_join(temp4) |> 
-  pivot_longer(n_child_mn:College) |> 
-  pivot_wider(names_from = GROUP)
-
-temp0 <- temp0 |> 
-  pivot_wider(names_from = GROUP, values_from = n) |> 
-  rename(name = County)
-
-tab_out <-tab_out |> 
-  rename(Treatment = "T", Control = "C") |> 
-  select(name, Treatment, Control) |> 
-  mutate(Treatment = round(Treatment, 2),
-         Control = round(Control, 2)) |> 
-  mutate(trt_pct = round(Treatment / 150 * 100, 2),
-         ctrl_pct = round(Control / 265 * 100, 2)) |> 
-  mutate(Trt = paste(Treatment, trt_pct, sep = ", "),
-         Ctrl = paste(Control, ctrl_pct, sep = ", ")) |> 
-  select(name, Trt, Ctrl)
-
-kable(tab_out)
+# revise from make_visuals.r based on post-linkage inclusion
+# # table 1 inputs ----------------------------------------------------------
+# group <- read_csv("./data/group_assignment.csv")
+# drops <- read_csv("./data/drops.csv")
+# datw1 <- read_csv("./data/w1_reduced.csv") |>
+#   left_join(group) |>
+#   rename(GROUP = Group) |>
+#   mutate(GROUP = ifelse(is.na(GROUP), "C", GROUP)) |> 
+#   filter(!ID%in%drops$ID)
+# 
+# 
+# temp0 <- datw1 |>
+#   group_by(GROUP, County) |>
+#   count()
+# # n_child replaced based on actual n post linkage, not survey n
+# temp1 <- datw1 |>
+#   group_by(GROUP) |>
+#   summarize(n_child_mn = mean(n_child), 
+#             n_child_sd = sd(n_child),
+#             Age_mn = mean(Age_c),
+#             Age_sd = sd(Age_c),
+#             GenderF = sum(Gender_s == "Female", na.rm = T),
+#             GenderF_pct = mean(Gender_s == "Female", na.rm = T) * 100) 
+# 
+# abstract <- datw1 |>
+#   summarize(n_child_mn = mean(n_child), 
+#             n_child_sd = sd(n_child),
+#             Age_mn = mean(Age_c),
+#             Age_sd = sd(Age_c),
+#             GenderF = sum(Gender_s == "Female", na.rm = T),
+#             GenderF_pct = mean(Gender_s == "Female", na.rm = T) * 100) 
+# 
+# temp2 <- datw1 |>
+#   group_by(GROUP) |>
+#   summarize(across(Race_White:Race_Other, sum, na.rm = T))
+# 
+# # edu levels for table, less than HS, HS or GED, some college
+# # levels: 
+# abs <- datw1 |>
+#   summarize(LessThanHS = mean(Edu<5, na.rm=T),
+#             HS = mean((Edu==5) | (Edu==6), na.rm=T),
+#             College = mean(Edu>6, na.rm=T))
+# temp4 <- datw1 |>
+#   group_by(GROUP) |>
+#   summarize(
+#     LessThanHS = sum(Edu<5, na.rm=T),
+#     HS = sum((Edu==5) | (Edu==6), na.rm=T),
+#     College = sum(Edu>6, na.rm=T))
+# 
+# tab_out <- temp1 |> 
+#   left_join(temp2) |> 
+#   left_join(temp4) |> 
+#   pivot_longer(n_child_mn:College) |> 
+#   pivot_wider(names_from = GROUP)
+# 
+# temp0 <- temp0 |> 
+#   pivot_wider(names_from = GROUP, values_from = n) |> 
+#   rename(name = County)
+# 
+# tab_out <-tab_out |> 
+#   rename(Treatment = "T", Control = "C") |> 
+#   select(name, Treatment, Control) |> 
+#   mutate(Treatment = round(Treatment, 2),
+#          Control = round(Control, 2)) |> 
+#   mutate(trt_pct = round(Treatment / 150 * 100, 2),
+#          ctrl_pct = round(Control / 265 * 100, 2)) |> 
+#   mutate(Trt = paste(Treatment, trt_pct, sep = ", "),
+#          Ctrl = paste(Control, ctrl_pct, sep = ", ")) |> 
+#   select(name, Trt, Ctrl)
+# 
+# kable(tab_out)
 ```
 
 # Table 2

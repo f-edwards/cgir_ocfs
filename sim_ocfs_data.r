@@ -2,8 +2,7 @@ library(tidyverse)
 # read in empirical distributions
 # scale down w1 to six months
 # delete after adjusting descriptive tables
-dat <- read_csv("./output1_12_26/child_table_period.csv")
-dat <- read_csv("./output6_5_26/child_period_freq.csv") |>
+dat <- read_csv("./output/child_period_freq.csv") |>
   rename(n = n_child) |>
   filter(.imp == 0) |>
   select(-.imp)

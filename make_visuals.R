@@ -6,16 +6,25 @@ library(patchwork)
 theme_set(theme_bw())
 # table 1 inputs ----------------------------------------------------------
 group <- read_csv("./data/group_assignment.csv")
+# need to exclude drops
+drops <- read_csv("./data/drops.csv")
+# for means, compute with actual denominators, not na.rm denominators
 
 datw1 <- read_csv("./data/w1_reduced.csv") |>
   left_join(group) |>
   rename(GROUP = Group) |>
-  mutate(GROUP = ifelse(is.na(GROUP), "C", GROUP))
+  mutate(GROUP = ifelse(is.na(GROUP), "C", GROUP)) |>
+  filter(!ID %in% drops$ID)
 
 datw1 |>
   group_by(GROUP) |>
   summarize(n = n()) |>
   mutate(prop = n / sum(n))
+# names reported to OCFS based on non-withdraws on survey
+c_n_hh <- 266
+t_n_hh <- 150
+c_n_child <- 648
+t_n_child <- 358
 
 datw1 |>
   group_by(GROUP, County) |>
@@ -28,30 +37,56 @@ datw1 |>
   summarize(n_child = sum(n_child))
 
 datw1 |>
-  summarize(mn = mean(n_child), sd = sd(n_child))
+  group_by(GROUP) |>
+  summarize(sd = sd(n_child))
 
 datw1 |>
   group_by(GROUP) |>
-  summarize(Age_c = mean(Age_c))
+  summarize(Age_mn = mean(Age_c), Age_sd = sd(Age_c))
 
 datw1 |>
   group_by(GROUP) |>
   summarize(
-    GenderF = mean(Gender_s == "Female", na.rm = T)
+    GenderF = sum(Gender_s == "Female", na.rm = T)
+  ) |>
+  pivot_wider(names_from = GROUP, values_from = GenderF) |>
+  mutate(c_pct = C / c_n_hh * 100, t_pct = T / t_n_hh * 100)
+
+datw1 |>
+  summarize(
+    GenderF = sum(Gender_s == "Female", na.rm = T)
   )
 
 datw1 |>
   group_by(GROUP) |>
-  summarize(across(Race_White:Race_Other, mean, na.rm = T))
+  summarize(across(Race_White:Race_Other, sum, na.rm = T)) |>
+  pivot_longer(Race_White:Race_Other) |>
+  pivot_wider(names_from = GROUP, values_from = value) |>
+  mutate(c_pct = C / c_n_hh * 100, t_pct = T / t_n_hh * 100) |>
+  arrange(name)
 
 datw1 |>
   group_by(GROUP) |>
-  summarize(across(Race_White:Race_Other, sum, na.rm = T))
-
+  summarize(across(Race_White:Race_Other, \(x) sum(is.na(x))))
 
 datw1 |>
   group_by(GROUP, County) |>
   count()
+
+# edu levels for table, less than HS, HS or GED, some college
+# levels:
+datw1 |>
+  group_by(GROUP) |>
+  summarize(
+    LessThanHS = sum(Edu < 5, na.rm = T),
+    HS = sum((Edu == 5) | (Edu == 6), na.rm = T),
+    College = sum(Edu > 6, na.rm = T),
+    edu_na = sum(is.na(Edu))
+  ) |>
+  pivot_longer(cols = LessThanHS:edu_na) |>
+  pivot_wider(names_from = GROUP, values_from = value) |>
+  mutate(c_pct = C / c_n_hh * 100, t_pct = T / t_n_hh * 100)
+
 
 t <- datw1 |>
   group_by(GROUP, Edu) |>
@@ -176,7 +211,7 @@ ggplot(
   ) +
   facet_wrap(~var, scales = "free", nrow = 4, strip.position = "top")
 
-ggsave("./vis/fig2.png", width = 8, height = 6, units = "in", dpi = 300)
+ggsave("./vis/fig2.pdf", width = 8, height = 6, units = "in")
 
 # posterior inference ---------------------------------------------------------
 # pull parameter estimates from .csv files directly
@@ -398,47 +433,8 @@ out_joint_b_s3 <- out_joint |>
 
 write_csv(out_joint_b_s3, file = "./vis/reg_table_collapsed_periods.csv")
 
-# LPM ---------------------------------------------------------------------
-
-models <- data.frame(
-  path = c(
-    "./output/TotalCPS_lpm.csv",
-    "./output/Confirmed_lpm.csv",
-    "./output/Prev_lpm.csv",
-    "./output/FC_lpm.csv"
-  ),
-  variable = c(
-    "Maltreatment report",
-    "Confirmed maltreatment",
-    "Preventive services",
-    "Foster care"
-  )
-)
-
-out_joint <- list()
-for (i in 1:nrow(models)) {
-  out <- read_csv(models$path[i])
-  out$variable <- models$variable[i]
-  out$CI_low <- out$estimate - 1.96 * out$std.error
-  out$CI_high <- out$estimate + 1.96 * out$std.error
-  out_joint[[i]] <- out
-}
-
-out_joint <- bind_rows(out_joint)
-
-out_joint_lpm <- out_joint |>
-  mutate(q = p.adjust(p.value, method = "BH")) |>
-  filter(
-    term %in% c("Wave2:GROUPT", "Wave3:GROUPT", "Wave4:GROUPT")
-  )
-
-out_joint <- bind_rows(out_joint)
-
-write_csv(out_joint_lpm, file = "./vis/reg_table_lpm.csv")
-
-
 # posterior visuals -------------------------------------------------------
-
+# for focal through s2
 models <- data.frame(
   path = c(
     "./output/TotalCPS_b.csv",
@@ -456,16 +452,15 @@ models <- data.frame(
   ),
   variable = rep(
     c(
-      "Maltreatment report",
-      "Confirmed maltreatment",
-      "Preventive services",
-      "Foster care"
+      "1. Maltreatment report",
+      "2. Confirmed maltreatment",
+      "3. Preventive services",
+      "4. Foster care"
     )
   ),
-  type = c(
-    rep("1. Primary", 4),
-    rep("2. Complete case", 4),
-    rep("3. Demographic controls", 4)
+  type = rep(
+    c("1. Primary", "2. Complete case", "3. Demographic controls"),
+    each = 4
   )
 )
 
@@ -491,54 +486,65 @@ for (i in 1:length(p_dat)) {
 }
 
 p_out <- bind_rows(p_out)
-
-
-p1 <- p_out |>
-  filter(variable == "Maltreatment report") |>
-  ggplot(aes(x = estimate)) +
-  stat_halfeye(
-    .width = c(0, 0, 0.95),
-    fatten_point = 0.5
+ggplot(p_out, aes(x = exp(estimate), y = var, color = type)) +
+  stat_pointinterval(
+    position = position_dodge(width = 0.3),
+    .width = c(0, 0.9),
+    alpha = 0.8
   ) +
-  geom_vline(xintercept = 0, lty = 2) +
-  labs(y = "", x = "Odds ratio", subtitle = "Maltreatment report") +
-  facet_grid(type ~ var, scales = "free_y")
-p2 <- p_out |>
-  filter(variable == "Confirmed maltreatment") |>
-  ggplot(aes(x = estimate)) +
-  stat_halfeye(
-    .width = c(0, 0, 0.95),
-    fatten_point = 0.5
-  ) +
-  geom_vline(xintercept = 0, lty = 2) +
-  labs(y = "", x = "Odds ratio", subtitle = "Confirmed maltreatment") +
-  facet_grid(type ~ var)
-p3 <- p_out |>
-  filter(variable == "Preventive services") |>
-  ggplot(aes(x = estimate)) +
-  stat_halfeye(
-    .width = c(0, 0, 0.95),
-    fatten_point = 0.5
-  ) +
-  geom_vline(xintercept = 0, lty = 2) +
-  labs(y = "", x = "Beta", subtitle = "3. Preventive services") +
-  facet_grid(type ~ var, scales = "free")
+  geom_vline(xintercept = 1, lty = 2) +
+  facet_wrap(~variable) +
+  labs(color = "Specification", x = "Odds ratio", y = "") +
+  theme(legend.position = 'bottom')
+ggsave("./vis/post_compare.pdf", width = 12, height = 7)
 
-p4 <- p_out |>
-  filter(variable == "Foster care") |>
-  ggplot(aes(x = estimate)) +
-  stat_halfeye(
-    .width = c(0, 0, 0.95),
-    fatten_point = 0.5
+# for s3
+models <- data.frame(
+  path = c(
+    "./output/TotalCPS_b_s3.csv",
+    "./output/Confirmed_b_s3.csv",
+    "./output/Prev_b_s3.csv",
+    "./output/FC_b_s3.csv"
+  ),
+  variable = rep(
+    c(
+      "1. Maltreatment report",
+      "2. Confirmed maltreatment",
+      "3. Preventive services",
+      "4. Foster care"
+    )
+  )
+)
+
+p_dat <- map(models$path, read_csv)
+p_out <- list()
+for (i in 1:length(p_dat)) {
+  temp <- p_dat[[i]] |>
+    select(`b_Wave_collapsedTreatment:GROUPT`, `b_Wave_collapsedPost:GROUPT`) |>
+    pivot_longer(
+      cols = everything(),
+      names_to = "var",
+      values_to = "estimate"
+    ) |>
+    mutate(
+      var = case_when(
+        var ==
+          "b_Wave_collapsedTreatment:GROUPT" ~ "1. Treatment period (12 months)",
+        var == "b_Wave_collapsedPost:GROUPT" ~ "2. Post-treatment"
+      )
+    ) |>
+    mutate(type = models$type[i], variable = models$variable[i])
+  p_out[[i]] <- temp
+}
+
+p_out <- bind_rows(p_out)
+
+ggplot(p_out, aes(x = exp(estimate), y = var)) +
+  stat_pointinterval(
+    .width = c(0, 0.9)
   ) +
-  geom_vline(xintercept = 0, lty = 2) +
-  coord_cartesian(xlim = c(-35, 2)) +
-  labs(y = "", x = "Beta", subtitle = "4. Foster care") +
-  facet_grid(type ~ var, scales = "free")
+  geom_vline(xintercept = 1, lty = 2) +
+  facet_wrap(~variable) +
+  labs(x = "Odds ratio", y = "")
 
-
-p1 + p2 + plot_layout(axes = "collect_y")
-ggsave("./vis/posteriors_1.pdf", width = 12, height = 7)
-p3 + p4 + plot_layout(axes = "collect_y")
-ggsave("./vis/posteriors_2.pdf", width = 12, height = 7)
-# SPLIT INTO TWO PLOTS
+ggsave("./vis/posteriors_single.pdf", width = 12, height = 7)
