@@ -8,8 +8,10 @@
 library(tidyverse)
 library(brms)
 library(tidybayes)
+library(rstan)
 set.seed(1)
 # read anonymized hh data
+rstan_options(auto_write = TRUE)
 dat <- read_csv("./data/anon_sim_dat.csv")
 
 # allocation ------------------------------------------------------------------
@@ -181,8 +183,13 @@ for (i in 1:length(sims_out)) {
       post_lwr = exp(quantile(value, 0.025)),
       post_upr = exp(quantile(value, 0.975))
     )
+  
+  filename <- paste("./output/fc_sim", i, ".csv", sep = "")
+  
+  write_csv(temp, filename)
 
   fc_post_out[[i]] <- temp
+  
 }
 
 #output
