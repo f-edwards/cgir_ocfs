@@ -19,11 +19,7 @@ county_error <- data.frame(
   county_error = rnorm(3, 0, 2)
 )
 ## household error
-# hh_error <- ID_list |>
-#   ,
-#          County = sample(counties, nrow(ID_list), replace = T))
 
-### FIX THIS SO EACH HH HAS CORRECT N OF CHILDREN
 w1 <- read_csv("./data/w1_reduced.csv") |>
   mutate(COUNTY = str_sub(County, 1, -8)) |>
   select(ID, COUNTY, n_child) |>

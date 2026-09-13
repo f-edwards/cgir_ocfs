@@ -199,3 +199,16 @@ for (i in 1:length(sims_out)) {
 fc_post_out |>
   bind_rows() |>
   write_csv("./data/power_fc_mc_sim.csv")
+
+
+### fisher test on observed
+fc_child_t1 <- matrix(c(0, 343, 6, 637), nrow = 2)
+fisher.test(fc_child_t1)
+
+fc_child_t2 <- matrix(c(0, 343, 9, 634), nrow = 2)
+fisher.test(fc_child_t2)
+
+fc_hh_t1 <- matrix(c(0, 150, 2, 264), nrow = 2)
+fisher.test(fc_hh_t1)
+fc_hh_t2 <- matrix(c(0, 150, 4, 262), nrow = 2)
+fisher.test(fc_hh_t2)

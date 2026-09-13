@@ -16,11 +16,11 @@ library(mice)
 
 # data input --------------------------------------------------------------
 # for FE simulation
-# source("sim_ocfs_data.R")
+source("sim_ocfs_data.R")
 
 # FOR OCFS DATA make_c_long will pivot wide to long
-cdat <- read_csv("FILENAME.csv")
-source("make_c_long.r")
+# cdat <- read_csv("FILENAME.csv")
+# source("make_c_long.r")
 
 # imputation --------------------------------------------------------------
 # first time, source to generate imputed data from withdrawals.

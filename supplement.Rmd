@@ -169,29 +169,33 @@ labels <- c("Intercept", "Wave 2", "Wave 3", "Wave 4",
 
 tab_m_total <- summarize_draws(m_total) |>
   mutate("variable" = labels) |>
-  select(variable, mean, sd, q5, q95) |> 
+  select(variable, q5, q95) |> 
+  mutate(across(q5:q95, exp)) |> 
   mutate(p = 2 * (1-p_direction(m_total)$pd[4:ncol(m_total)])) |> 
   slice(1:11)
 
 tab_m_confirmed <- summarize_draws(m_confirmed) |>
   mutate("variable" = labels) |>
-  select(variable, mean, sd, q5, q95) |>
+  select(variable, q5, q95) |>
+  mutate(across(q5:q95, exp)) |> 
   mutate(p = 2 * (1-p_direction(m_confirmed)$pd[4:ncol(m_confirmed)])) |> 
   slice(1:11)
 
 tab_m_prev <- summarize_draws(m_prev) |>
   mutate("variable" = labels) |>
-  select(variable, mean, sd, q5, q95) |>
+  select(variable, q5, q95) |>
+  mutate(across(q5:q95, exp)) |> 
   mutate(p = 2 * (1-p_direction(m_prev)$pd[4:ncol(m_prev)])) |> 
   slice(1:11)
 
 tab_m_fc <- summarize_draws(m_fc) |>
   mutate("variable" = labels) |>
-  select(variable, mean, sd, q5, q95) |>
+  select(variable, q5, q95) |>
+  mutate(across(q5:q95, exp)) |> 
   mutate(p = 2 * (1-p_direction(m_fc)$pd[4:ncol(m_fc)])) |> 
   slice(1:11)
 
-names_tab <- c("", "Estimate", "Est.Error", "l-95% CI", "u-95% CI", "p")
+names_tab <- c("", "l-95% CI", "u-95% CI", "p")
 names(tab_m_total) <- names_tab
 names(tab_m_confirmed) <- names_tab
 names(tab_m_prev) <- names_tab

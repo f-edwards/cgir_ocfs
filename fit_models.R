@@ -50,7 +50,6 @@ for (i in 1:5) {
 
   temp <- c_long_imp |>
     filter(.imp == i)
-  p_data[[i]] <- pdata.frame(temp, index = c("Child", "Wave"))
 }
 
 # subset for complete case sensitivity models
@@ -186,6 +185,29 @@ Confirmed_b <- brm_multiple(
   cores = cores,
   control = model_controls
 )
+
+Confirmed_h <- brm_multiple(
+  Confirmed > 0 ~ Wave + GROUP:Wave + COUNTY + (1 | ID),
+  family = bernoulli(),
+  data = c_imp,
+  prior = priorsL,
+  iter = iter,
+  cores = cores,
+  control = model_controls
+)
+
+
+Confirmed_h_nested <- brm_multiple(
+  Confirmed > 0 ~ Wave + GROUP:Wave + COUNTY + (1 | ID / Child),
+  family = bernoulli(),
+  data = c_imp,
+  prior = priorsL,
+  iter = iter,
+  cores = cores,
+  control = model_controls
+)
+
+
 #### output
 # parameter estimates and CI
 sink("./output/Confirmed_b.txt")

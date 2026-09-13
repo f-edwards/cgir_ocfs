@@ -66,18 +66,20 @@ post_df |>
   geom_linerange(alpha = 0.5) +
   geom_hline(yintercept = 1, lty = 2) +
   geom_text(
-    aes(label = prop_sig, x = 90, y = 8),
+    aes(
+      label = paste("P(reject null", "=", prop_sig, ")", sep = ""),
+      x = 90,
+      y = 8
+    ),
     color = "black"
   ) +
   facet_grid(var ~ theta_fct) +
   coord_cartesian(ylim = c(0, 9), xlim = c(0, 100)) +
   scale_y_sqrt(breaks = c(0, 0.25, 1, 2.5, 5)) +
   labs(
-    x = "",
+    x = "Simulation number",
     y = "Odds Ratio",
     color = expression(paste("Reject ", H[0], sep = "")),
-    title = "Monte Carlo simulation of foster care entries under no treatment effect scenario",
-    subtitle = "95 percent posterior intervals",
     caption = "Note square root scale on y-axis"
   ) +
   theme_tidybayes()
@@ -102,11 +104,9 @@ post_df |>
     color = "black"
   ) +
   labs(
-    x = "",
-    y = "Odds Ratio",
+    x = "Simulation number",
+    y = "Odds ratio",
     color = expression(paste("Reject ", H[0], sep = "")),
-    title = "Monte Carlo simulation of foster care entries under varying treatment effect scenarios",
-    subtitle = "95 percent posterior intervals",
     caption = "Note square root scale on y-axis"
   ) +
   theme_tidybayes()
@@ -114,3 +114,14 @@ post_df |>
 ### maybe just change to reject H_0
 
 ggsave("./vis/power_sim_type2.png", width = 12, height = 8)
+
+## Power table
+post_df |>
+  filter(var != "Post-treatment") |>
+  filter(theta_fct != "Theta = 0 (Null)") |>
+  group_by(var, theta_fct) |>
+  summarize(
+    prop_sig = round(mean(sig), 2),
+    type2 = 1 - mean(sig)
+  ) |>
+  arrange(theta_fct)

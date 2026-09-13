@@ -489,7 +489,7 @@ p_out <- bind_rows(p_out)
 ggplot(p_out, aes(x = exp(estimate), y = var, color = type)) +
   stat_pointinterval(
     position = position_dodge(width = 0.3),
-    .width = c(0, 0.9),
+    .width = c(0, 0.95),
     alpha = 0.8
   ) +
   geom_vline(xintercept = 1, lty = 2) +
@@ -541,7 +541,7 @@ p_out <- bind_rows(p_out)
 
 ggplot(p_out, aes(x = exp(estimate), y = var)) +
   stat_pointinterval(
-    .width = c(0, 0.9)
+    .width = c(0, 0.95)
   ) +
   geom_vline(xintercept = 1, lty = 2) +
   facet_wrap(~variable) +
