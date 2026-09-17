@@ -7,7 +7,6 @@ set.seed(8625)
 library(tidyverse)
 library(tidybayes)
 library(brms)
-library(plm)
 library(lmtest)
 
 ### settings for brms
@@ -32,7 +31,6 @@ start_time <- Sys.time()
 # 4) FE LPM
 
 # set up imputed data in list with secondary collapsed treatment time
-# and pdata.frames for plm
 c_imp <- list()
 p_data <- list()
 for (i in 1:5) {
@@ -58,9 +56,9 @@ c_imp_complete_case <- c_long_imp |>
 
 # regression models -------------------------------------------------------
 # priors ------------------------------------------------------------------
-priorsL <- priorsL_FC <- c(
+priorsL <- c(
   set_prior("cauchy(0, 10)", class = "b"),
-  set_prior("cauchy(0, 10)", class = "Intercept"),
+  set_prior("cauchy(0, 2.5)", class = "Intercept"),
   set_prior("student_t(3, 0, 1)", class = "sd")
 )
 
@@ -155,24 +153,6 @@ sink()
 tidy_draws(TotalCPS_b_s3) |>
   select(.chain:Intercept) |>
   write_csv("./output/TotalCPS_b_s3.csv")
-
-# 4. fixed effects linear probability
-m_out <- list()
-for (i in 1:length(p_data)) {
-  temp <- p_data[[i]]
-  m_temp <- plm(
-    TotalCPS > 0 ~ COUNTY + Wave + GROUP:Wave,
-    data = temp,
-    effect = "individual",
-    model = "within"
-  )
-
-  m_out[[i]] <- coeftest(m_temp, function(x) {
-    vcovHC(x, type = 'HC0', cluster = 'group')
-  })
-}
-
-write_csv(summary(pool(m_out)), file = "./output/TotalCPS_lpm.csv")
 
 # confirmed -----------------------------------------------------------
 # 0. focal model
@@ -289,24 +269,6 @@ tidy_draws(Confirmed_b_s3) |>
   select(.chain:Intercept) |>
   write_csv("./output/Confirmed_b_s3.csv")
 
-# 4. fixed effects linear probability
-m_out <- list()
-for (i in 1:length(p_data)) {
-  temp <- p_data[[i]]
-  m_temp <- plm(
-    Confirmed > 0 ~ COUNTY + Wave + GROUP:Wave,
-    data = temp,
-    effect = "individual",
-    model = "within"
-  )
-
-  m_out[[i]] <- coeftest(m_temp, function(x) {
-    vcovHC(x, type = 'HC0', cluster = 'group')
-  })
-}
-
-write_csv(summary(pool(m_out)), file = "./output/Confirmed_lpm.csv")
-
 # Prevention --------------------------------------------------------------
 
 # 0. focal model
@@ -400,25 +362,6 @@ tidy_draws(Prev_b_s3) |>
   select(.chain:Intercept) |>
   write_csv("./output/Prev_b_s3.csv")
 
-# 4. fixed effects linear probability
-m_out <- list()
-for (i in 1:length(p_data)) {
-  temp <- p_data[[i]]
-  m_temp <- plm(
-    Prev > 0 ~ COUNTY + Wave + GROUP:Wave,
-    data = temp,
-    effect = "individual",
-    model = "within"
-  )
-
-  m_out[[i]] <- coeftest(m_temp, function(x) {
-    vcovHC(x, type = 'HC0', cluster = 'group')
-  })
-}
-
-write_csv(summary(pool(m_out)), file = "./output/Prev_lpm.csv")
-
-
 # Foster care -------------------------------------------------------------
 
 # 0. focal model
@@ -511,21 +454,3 @@ sink()
 tidy_draws(FC_b_s3) |>
   select(.chain:Intercept) |>
   write_csv("./output/FC_b_s3.csv")
-
-# 4. fixed effects linear probability
-m_out <- list()
-for (i in 1:length(p_data)) {
-  temp <- p_data[[i]]
-  m_temp <- plm(
-    FC > 0 ~ COUNTY + Wave + GROUP:Wave,
-    data = temp,
-    effect = "individual",
-    model = "within"
-  )
-
-  m_out[[i]] <- coeftest(m_temp, function(x) {
-    vcovHC(x, type = 'HC0', cluster = 'group')
-  })
-}
-
-write_csv(summary(pool(m_out)), file = "./output/FC_lpm.csv")
