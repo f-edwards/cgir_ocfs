@@ -211,7 +211,7 @@ ggplot(
   ) +
   facet_wrap(~var, scales = "free", nrow = 4, strip.position = "top")
 
-ggsave("./vis/fig2.pdf", width = 8, height = 6, units = "in")
+ggsave("./vis/fig2.png", width = 8, height = 6, units = "in")
 
 # posterior inference ---------------------------------------------------------
 # pull parameter estimates from .csv files directly
@@ -253,6 +253,8 @@ out_joint <- bind_rows(out_joint)
 out_joint$OR <- exp(out_joint$Median)
 out_joint$OR_low <- exp(out_joint$CI_low)
 out_joint$OR_high <- exp(out_joint$CI_high)
+
+write_csv(out_joint, "./vis/supplement_reg_tables.csv")
 ## BH adjustment
 ### following Makowski et al 2019;
 # https://doi.org/10.3389/fpsyg.2019.02767
@@ -496,7 +498,7 @@ ggplot(p_out, aes(x = exp(estimate), y = var, color = type)) +
   facet_wrap(~variable) +
   labs(color = "Specification", x = "Odds ratio", y = "") +
   theme(legend.position = 'bottom')
-ggsave("./vis/post_compare.pdf", width = 12, height = 7)
+ggsave("./vis/post_compare.png", width = 12, height = 7)
 
 # for s3
 models <- data.frame(
@@ -547,4 +549,4 @@ ggplot(p_out, aes(x = exp(estimate), y = var)) +
   facet_wrap(~variable) +
   labs(x = "Odds ratio", y = "")
 
-ggsave("./vis/posteriors_single.pdf", width = 12, height = 7)
+ggsave("./vis/posteriors_single.png", width = 12, height = 7)

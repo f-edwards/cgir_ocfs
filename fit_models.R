@@ -1,3 +1,5 @@
+### adapt based on nested with changed priors, nested structure
+
 set.seed(8625)
 ### run once, then comment out with #
 # install.packages(c("tidyverse", "brms", "tidybayes"))
@@ -7,7 +9,6 @@ set.seed(8625)
 library(tidyverse)
 library(tidybayes)
 library(brms)
-library(lmtest)
 
 ### settings for brms
 cores <- parallel::detectCores()
@@ -65,7 +66,7 @@ priorsL <- c(
 # total reports -----------------------------------------------------------
 # 0. focal model
 TotalCPS_b <- brm_multiple(
-  TotalCPS > 0 ~ Wave + GROUP:Wave + COUNTY + (1 | Child),
+  TotalCPS > 0 ~ Wave + GROUP:Wave + COUNTY + (1 | ID / Child),
   family = bernoulli(),
   data = c_imp,
   prior = priorsL,
@@ -88,7 +89,7 @@ tidy_draws(TotalCPS_b) |>
 
 # 1. complete case
 TotalCPS_b_s1 <- brm(
-  TotalCPS > 0 ~ Wave + GROUP:Wave + COUNTY + (1 | Child),
+  TotalCPS > 0 ~ Wave + GROUP:Wave + COUNTY + (1 | ID / Child),
   family = bernoulli(),
   data = c_imp_complete_case,
   prior = priorsL,
@@ -118,7 +119,7 @@ TotalCPS_b_s2 <- brm_multiple(
     scale(Kessler_Score) +
     scale(AH_Total) +
     scale(Total_FW_Score) +
-    (1 | Child),
+    (1 | ID / Child),
   data = c_imp,
   family = bernoulli(),
   prior = priorsL,
@@ -137,7 +138,10 @@ tidy_draws(TotalCPS_b_s2) |>
 
 # 3. Collapsed time
 TotalCPS_b_s3 <- brm_multiple(
-  TotalCPS > 0 ~ Wave_collapsed + GROUP:Wave_collapsed + COUNTY + (1 | Child),
+  TotalCPS > 0 ~ Wave_collapsed +
+    GROUP:Wave_collapsed +
+    COUNTY +
+    (1 | ID / Child),
   family = bernoulli(),
   data = c_imp,
   prior = priorsL,
@@ -157,7 +161,7 @@ tidy_draws(TotalCPS_b_s3) |>
 # confirmed -----------------------------------------------------------
 # 0. focal model
 Confirmed_b <- brm_multiple(
-  Confirmed > 0 ~ Wave + GROUP:Wave + COUNTY + (1 | Child),
+  Confirmed > 0 ~ Wave + GROUP:Wave + COUNTY + (1 | ID / Child),
   family = bernoulli(),
   data = c_imp,
   prior = priorsL,
@@ -203,7 +207,7 @@ tidy_draws(Confirmed_b) |>
 
 # 1. complete case
 Confirmed_b_s1 <- brm(
-  Confirmed > 0 ~ Wave + GROUP:Wave + COUNTY + (1 | Child),
+  Confirmed > 0 ~ Wave + GROUP:Wave + COUNTY + (1 | ID / Child),
   family = bernoulli(),
   data = c_imp_complete_case,
   prior = priorsL,
@@ -233,7 +237,7 @@ Confirmed_b_s2 <- brm_multiple(
     scale(Kessler_Score) +
     scale(AH_Total) +
     scale(Total_FW_Score) +
-    (1 | Child),
+    (1 | ID / Child),
   data = c_imp,
   family = bernoulli(),
   prior = priorsL,
@@ -252,7 +256,10 @@ tidy_draws(Confirmed_b_s2) |>
 
 # 3. Collapsed time
 Confirmed_b_s3 <- brm_multiple(
-  Confirmed > 0 ~ Wave_collapsed + GROUP:Wave_collapsed + COUNTY + (1 | Child),
+  Confirmed > 0 ~ Wave_collapsed +
+    GROUP:Wave_collapsed +
+    COUNTY +
+    (1 | ID / Child),
   family = bernoulli(),
   data = c_imp,
   prior = priorsL,
@@ -273,7 +280,7 @@ tidy_draws(Confirmed_b_s3) |>
 
 # 0. focal model
 Prev_b <- brm_multiple(
-  Prev > 0 ~ Wave + GROUP:Wave + COUNTY + (1 | Child),
+  Prev > 0 ~ Wave + GROUP:Wave + COUNTY + (1 | ID / Child),
   family = bernoulli(),
   data = c_imp,
   prior = priorsL,
@@ -296,7 +303,7 @@ tidy_draws(Prev_b) |>
 
 # 1. complete case
 Prev_b_s1 <- brm(
-  Prev > 0 ~ Wave + GROUP:Wave + COUNTY + (1 | Child),
+  Prev > 0 ~ Wave + GROUP:Wave + COUNTY + (1 | ID / Child),
   family = bernoulli(),
   data = c_imp_complete_case,
   prior = priorsL,
@@ -326,7 +333,7 @@ Prev_b_s2 <- brm_multiple(
     scale(Kessler_Score) +
     scale(AH_Total) +
     scale(Total_FW_Score) +
-    (1 | Child),
+    (1 | ID / Child),
   data = c_imp,
   family = bernoulli(),
   prior = priorsL,
@@ -345,7 +352,7 @@ tidy_draws(Prev_b_s2) |>
 
 # 3. Collapsed time
 Prev_b_s3 <- brm_multiple(
-  Prev > 0 ~ Wave_collapsed + GROUP:Wave_collapsed + COUNTY + (1 | Child),
+  Prev > 0 ~ Wave_collapsed + GROUP:Wave_collapsed + COUNTY + (1 | ID / Child),
   family = bernoulli(),
   data = c_imp,
   prior = priorsL,
@@ -366,7 +373,7 @@ tidy_draws(Prev_b_s3) |>
 
 # 0. focal model
 FC_b <- brm_multiple(
-  FC > 0 ~ Wave + GROUP:Wave + COUNTY + (1 | Child),
+  FC > 0 ~ Wave + GROUP:Wave + COUNTY + (1 | ID / Child),
   family = bernoulli(),
   data = c_imp,
   prior = priorsL,
@@ -389,7 +396,7 @@ tidy_draws(FC_b) |>
 
 # 1. complete case
 FC_b_s1 <- brm(
-  FC > 0 ~ Wave + GROUP:Wave + COUNTY + (1 | Child),
+  FC > 0 ~ Wave + GROUP:Wave + COUNTY + (1 | ID / Child),
   family = bernoulli(),
   data = c_imp_complete_case,
   prior = priorsL,
@@ -419,7 +426,7 @@ FC_b_s2 <- brm_multiple(
     scale(Kessler_Score) +
     scale(AH_Total) +
     scale(Total_FW_Score) +
-    (1 | Child),
+    (1 | ID / Child),
   data = c_imp,
   family = bernoulli(),
   prior = priorsL,
@@ -438,7 +445,7 @@ tidy_draws(FC_b_s2) |>
 
 # 3. Collapsed time
 FC_b_s3 <- brm_multiple(
-  FC > 0 ~ Wave_collapsed + GROUP:Wave_collapsed + COUNTY + (1 | Child),
+  FC > 0 ~ Wave_collapsed + GROUP:Wave_collapsed + COUNTY + (1 | ID / Child),
   family = bernoulli(),
   data = c_imp,
   prior = priorsL,
